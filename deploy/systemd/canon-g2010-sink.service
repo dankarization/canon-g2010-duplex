@@ -1,0 +1,29 @@
+[Unit]
+Description=Canon G2010 raw JetDirect sink (TCP 9100 -> /dev/usb/lp0)
+After=network.target
+# Serialize with any other user of the printer device.
+Conflicts=
+
+[Service]
+Type=simple
+# Runs as root so it can open root:lp /dev/usb/lp0 without adding a human to `lp`.
+# If you prefer a dedicated user, add it to group `lp` and set User=/Group= here.
+User=root
+Group=lp
+ExecStart=/usr/local/lib/canon-g2010/canon-g2010-sink.py \
+    --listen 0.0.0.0 --port 9100 --device /dev/usb/lp0 \
+    --lock /var/tmp/canon-live-test.lock
+Restart=on-failure
+RestartSec=2
+# Device access + modest hardening. PrivateDevices must stay off (we need the
+# real USB device); DeviceAllow narrows it to the printer node only.
+PrivateDevices=no
+DeviceAllow=/dev/usb/lp0 rw
+NoNewPrivileges=yes
+ProtectSystem=full
+ProtectHome=yes
+StandardOutput=journal
+StandardError=journal
+
+[Install]
+WantedBy=multi-user.target

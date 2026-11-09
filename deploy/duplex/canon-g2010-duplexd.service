@@ -1,0 +1,20 @@
+[Unit]
+Description=Canon G2010 server-side manual duplex confirm service (HTTP :8099)
+After=network.target canon-g2010-sink.service
+Wants=canon-g2010-sink.service
+
+[Service]
+Type=simple
+User=root
+Group=lp
+ExecStart=/usr/local/lib/canon-g2010/canon-g2010-duplexd.py --listen 0.0.0.0 --port 8099
+Restart=on-failure
+RestartSec=2
+NoNewPrivileges=yes
+ProtectSystem=full
+ProtectHome=yes
+StandardOutput=journal
+StandardError=journal
+
+[Install]
+WantedBy=multi-user.target
